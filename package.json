@@ -1,0 +1,28 @@
+{
+  "name": "techautogame-hub",
+  "version": "1.0.0",
+  "description": "Automated multilingual tech/auto/gaming affiliate blog",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "generate": "node scripts/generate-content.js",
+    "fetch-trends": "node scripts/rss-fetcher.js"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "next": "14",
+    "next-intl": "^3.11.1",
+    "next-mdx-remote": "^6.0.0",
+    "node-fetch": "^2.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  }
+}

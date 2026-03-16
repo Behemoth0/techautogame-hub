@@ -1,0 +1,94 @@
+name: 🤖 Daily Content Generation (9 Categories)
+
+on:
+  schedule:
+    # Deux runs per day: 9:00 UTC (12:00 Kyiv) and 18:00 UTC (21:00 Kyiv)
+    - cron: '0 9 * * *'
+    - cron: '0 18 * * *'
+  workflow_dispatch: # Дозволяє запуск вручну через GitHub UI
+
+jobs:
+  generate-and-deploy:
+    name: Generate AI Content & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Fetch trending topics from RSS (9 categories)
+        run: node scripts/rss-fetcher.js
+        continue-on-error: true  # Не зупиняти якщо RSS недоступний — fallback теми є
+
+      - name: 🤖 Generate AI articles for all 9 categories
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          AMAZON_TAG: ${{ secrets.AMAZON_TAG }}
+        run: node scripts/generate-content.js
+
+      - name: 📊 Count generated articles
+        id: count
+        run: |
+          COUNT=$(ls content/posts/*.md 2>/dev/null | wc -l)
+          TODAY_COUNT=$(ls content/posts/$(date +%Y-%m-%d)*.md 2>/dev/null | wc -l)
+          echo "article_count=$COUNT" >> $GITHUB_OUTPUT
+          echo "today_count=$TODAY_COUNT" >> $GITHUB_OUTPUT
+          echo "✅ Total articles: $COUNT | Generated today: $TODAY_COUNT"
+
+      - name: 💾 Commit new articles to repository
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "TechAutoGame Bot 🤖"
+          git add content/posts/
+          git diff --staged --quiet || git commit -m "🤖 Auto-generated: $(date '+%Y-%m-%d %H:%M') — ${{ steps.count.outputs.today_count }} articles (9 categories)"
+
+      - name: 🚀 Push changes to GitHub
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
+      - name: ⚡ Trigger Vercel redeployment
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$VERCEL_DEPLOY_HOOK" ]; then
+            curl -X POST "$VERCEL_DEPLOY_HOOK"
+            echo "✅ Vercel deployment triggered!"
+          else
+            echo "ℹ️  VERCEL_DEPLOY_HOOK not set — Vercel auto-deploys from GitHub push anyway"
+          fi
+
+      - name: 🌐 Ping Google Search Console
+        run: |
+          SITE_URL="https://techautogame-hub.vercel.app"
+          curl -s "https://www.google.com/ping?sitemap=${SITE_URL}/sitemap.xml" || true
+          echo "📡 Sitemap pinged for: $SITE_URL"
+
+      - name: 📢 Telegram notification
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            COUNT=${{ steps.count.outputs.article_count }}
+            TODAY=${{ steps.count.outputs.today_count }}
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d "chat_id=${TELEGRAM_CHAT_ID}" \
+              -d "text=✅ TechAutoGame Hub: сьогодні опубліковано ${TODAY} нових статей (9 категорій)!%0AВсього статей: ${COUNT}%0A🌐 https://techautogame-hub.vercel.app" \
+              -d "parse_mode=HTML"
+          fi

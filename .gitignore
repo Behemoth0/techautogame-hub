@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.next/
+.vercel/
+out/
+
+# Environment files (НЕ КОМІТИТИ!)
+.env
+.env.local
+.env.*.local
+
+# Generated content (комітяться через GitHub Actions)
+# content/posts/*.md  <- ці файли ПОТРІБНІ в репо для Vercel
+
+# AI scripts temp files
+scripts/trends.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/settings.json
+.idea/
+
+.vercel
