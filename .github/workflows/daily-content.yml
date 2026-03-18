@@ -11,6 +11,8 @@ jobs:
   generate-and-deploy:
     name: Generate AI Content & Deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 60
 
     steps:
