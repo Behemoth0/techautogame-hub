@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyD2StjlTDUoHwPvGMLQE2IDwZc9IEygsCQ';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyC_d0yLXMbEf7ZAxdQtA0EnyxDSkYdm4QQ';
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY || 'sAKT4YkrVhMIRyMzpi7NniyMdsfyg2JAgrG6lt_1GDQ';
 const CRON_SECRET = process.env.CRON_SECRET || 'techautogame-cron-2025';
 
@@ -54,7 +54,7 @@ function slugify(text: string): string {
 
 async function callGemini(prompt: string): Promise<string> {
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

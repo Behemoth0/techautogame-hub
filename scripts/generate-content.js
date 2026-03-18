@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 // =================== КОНФІГ ===================
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyD2StjlTDUoHwPvGMLQE2IDwZc9IEygsCQ';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyC_d0yLXMbEf7ZAxdQtA0EnyxDSkYdm4QQ';
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY || 'sAKT4YkrVhMIRyMzpi7NniyMdsfyg2JAgrG6lt_1GDQ';
 const AMAZON_TAG = process.env.AMAZON_TAG || 'techautogame-20';
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');

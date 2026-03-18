@@ -181,4 +181,9 @@ async function fetchTrends() {
 }
 
 // Запуск
-fetchTrends().catch(console.error);
+fetchTrends()
+  .then(() => process.exit(0))
+  .catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
