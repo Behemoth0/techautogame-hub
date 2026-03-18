@@ -53,19 +53,19 @@ jobs:
           echo "today_count=$TODAY_COUNT" >> $GITHUB_OUTPUT
           echo "✅ Total articles: $COUNT | Generated today: $TODAY_COUNT"
 
-      - name: 💾 Commit new articles to repository
+      - name: 💾 Commit and Push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "TechAutoGame Bot 🤖"
           git add content/posts/
-          git diff --staged --quiet || git commit -m "🤖 Auto-generated: $(date '+%Y-%m-%d %H:%M') — ${{ steps.count.outputs.today_count }} articles (9 categories)"
-
-      - name: 🔄 Pull latest changes
-        run: |
-          git pull --rebase origin main
-
-      - name: 🚀 Push changes to GitHub
-        run: git push origin main
+          
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            git commit -m "🤖 Auto-generated: $(date '+%Y-%m-%d %H:%M') — ${{ steps.count.outputs.today_count }} articles (9 categories)"
+            git pull --rebase origin main
+            git push origin main
+          fi
 
       - name: ⚡ Trigger Vercel redeployment
         env:
