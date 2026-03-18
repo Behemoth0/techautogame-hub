@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyC_d0yLXMbEf7ZAxdQtA0EnyxDSkYdm4QQ';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY || 'sAKT4YkrVhMIRyMzpi7NniyMdsfyg2JAgrG6lt_1GDQ';
 const CRON_SECRET = process.env.CRON_SECRET || 'techautogame-cron-2025';
 

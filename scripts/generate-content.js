@@ -12,10 +12,15 @@ const fs = require('fs');
 const path = require('path');
 
 // =================== КОНФІГ ===================
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyC_d0yLXMbEf7ZAxdQtA0EnyxDSkYdm4QQ';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY || 'sAKT4YkrVhMIRyMzpi7NniyMdsfyg2JAgrG6lt_1GDQ';
 const AMAZON_TAG = process.env.AMAZON_TAG || 'techautogame-20';
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
+
+if (!GEMINI_API_KEY) {
+  console.error("❌ CRITICAL ERROR: GEMINI_API_KEY is missing from environment variables!");
+  process.exit(1);
+}
 
 // Переконуємось що директорія існує
 if (!fs.existsSync(POSTS_DIR)) fs.mkdirSync(POSTS_DIR, { recursive: true });
@@ -243,8 +248,8 @@ async function generateArticle(topicData, category) {
     titleUk = ukData.titleUk || title;
     excerptUk = ukData.excerptUk || excerpt;
     console.log(`   🇺🇦 Ukrainian title: "${titleUk}"`);
-  } catch {
-    console.warn('   ⚠️  Ukrainian translation failed, using English');
+  } catch (e) {
+    console.warn('   ⚠️  Ukrainian translation failed, using English. Error:', e.message);
   }
 
   // Отримуємо зображення з Unsplash
