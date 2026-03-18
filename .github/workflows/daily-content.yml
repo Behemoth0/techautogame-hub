@@ -64,7 +64,7 @@ jobs:
           else
             git commit -m "🤖 Auto-generated: $(date '+%Y-%m-%d %H:%M') — ${{ steps.count.outputs.today_count }} articles (9 categories)"
             git pull --rebase origin main
-            git push origin main
+            git push origin main --force
           fi
 
       - name: ⚡ Trigger Vercel redeployment
