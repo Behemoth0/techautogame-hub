@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 
@@ -32,6 +33,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <GoogleAnalytics />
         {children}
+        {/* Monetag Multitag — CPM реклама (платить за перегляди) */}
+        <Script
+          src="https://quge5.com/88/tag.min.js"
+          data-zone="226965"
+          strategy="afterInteractive"
+          data-cfasync="false"
+        />
       </body>
     </html>
   );
