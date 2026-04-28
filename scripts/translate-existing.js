@@ -79,8 +79,8 @@ async function translateFile(filePath) {
     return;
   }
 
-  // Parse frontmatter
-  const match = contentRaw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  // Parse frontmatter (handling both LF and CRLF)
+  const match = contentRaw.match(/^---(?:\r?\n)([\s\S]*?)(?:\r?\n)---(?:\r?\n)([\s\S]*)$/);
   if (!match) {
     console.log(`⚠️ Could not parse frontmatter for ${path.basename(filePath)}`);
     return;
