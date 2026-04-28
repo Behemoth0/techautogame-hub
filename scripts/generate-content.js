@@ -204,16 +204,18 @@ Output FORMAT (strictly follow this JSON):
 Output ONLY valid JSON, no markdown blocks, no extra text.`;
 }
 
-function buildUkrainianPrompt(englishTitle, englishContent) {
-  return `Translate this tech article title and excerpt to Ukrainian language. Keep it natural and engaging.
+function buildUkrainianPrompt(englishTitle, englishExcerpt, englishContent) {
+  return `Translate this tech article title, excerpt, and the full content to Ukrainian language. Keep it natural and engaging. Make sure to preserve all Markdown formatting (## subheadings, lists, bold text, etc.) in the content translation.
 
 Title: ${englishTitle}
-Content preview: ${englishContent.slice(0, 300)}
+Excerpt: ${englishExcerpt}
+Content: ${englishContent}
 
 Output FORMAT (valid JSON only):
 {
   "titleUk": "Ukrainian translation of title",
-  "excerptUk": "Ukrainian translation of excerpt (max 160 chars)"
+  "excerptUk": "Ukrainian translation of excerpt (max 160 chars)",
+  "contentUk": "Ukrainian translation of the full content"
 }
 
 Output ONLY valid JSON, nothing else.`;
@@ -241,12 +243,14 @@ async function generateArticle(topicData, category) {
   // Отримуємо переклад українською
   let titleUk = title;
   let excerptUk = excerpt;
+  let contentUk = content;
   try {
-    const ukRaw = await callGemini(buildUkrainianPrompt(title, content));
+    const ukRaw = await callGemini(buildUkrainianPrompt(title, excerpt, content));
     const ukCleaned = ukRaw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const ukData = JSON.parse(ukCleaned);
     titleUk = ukData.titleUk || title;
     excerptUk = ukData.excerptUk || excerpt;
+    contentUk = ukData.contentUk || content;
     console.log(`   🇺🇦 Ukrainian title: "${titleUk}"`);
   } catch (e) {
     console.warn('   ⚠️  Ukrainian translation failed, using English. Error:', e.message);
@@ -276,6 +280,10 @@ amazonTag: "${AMAZON_TAG}"
 ---
 
 ${content}
+
+---UK---
+
+${contentUk}
 `;
 
   const filename = `${date}-${slug}.md`;

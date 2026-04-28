@@ -4,6 +4,7 @@ import ArticleCard, { Article } from '@/components/ArticleCard';
 import AdBanner from '@/components/AdBanner';
 import { getPostsByCategory } from '@/lib/posts';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
 
 const CATEGORY_META: Record<string, { emoji: string; title: string; description: string; color: string }> = {
@@ -134,11 +135,24 @@ export default async function CategoryPage({ params }: Props) {
   const meta = CATEGORY_META[cat as keyof typeof CATEGORY_META];
   if (!meta) notFound();
 
+  const cookieStore = cookies();
+  const lang = cookieStore.get('lang')?.value || 'en';
+
   let posts: Article[] = [];
   try {
     const rawPosts = getPostsByCategory(cat);
     if (rawPosts.length > 0) {
-      posts = rawPosts.map(p => ({ slug: p.slug, title: p.title, excerpt: p.excerpt, category: p.category, date: p.date, image: p.image, readTime: p.readTime, isNew: p.isNew, isHot: p.isHot }));
+      posts = rawPosts.map(p => ({ 
+        slug: p.slug, 
+        title: (lang === 'uk' && p.titleUk) ? p.titleUk : p.title, 
+        excerpt: (lang === 'uk' && p.excerptUk) ? p.excerptUk : p.excerpt, 
+        category: p.category, 
+        date: p.date, 
+        image: p.image, 
+        readTime: p.readTime, 
+        isNew: p.isNew, 
+        isHot: p.isHot 
+      }));
     }
   } catch {}
 

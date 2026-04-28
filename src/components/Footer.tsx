@@ -28,7 +28,6 @@ export default function Footer() {
       </div>
       <div className="footer-bottom">
         <span>© {year} TechAutoGame Hub. All rights reserved.</span>
-        <span>Built with ❤️ + AI</span>
       </div>
     </footer>
   );

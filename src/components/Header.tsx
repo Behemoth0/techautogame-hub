@@ -1,22 +1,35 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const NAV = [
-  { href: '/category/tech', label: '🔧 Tech' },
-  { href: '/category/auto', label: '🚗 Auto' },
-  { href: '/category/gaming', label: '🎮 Gaming' },
-  { href: '/category/auto-safety', label: '🛡️ Auto Safety' },
-  { href: '/category/auto-news', label: '🚘 Auto News' },
-  { href: '/category/pc-hardware', label: '💻 PC Hardware' },
-  { href: '/category/gaming-news', label: '🕹️ Gaming News' },
-  { href: '/category/ai', label: '🧠 AI' },
-  { href: '/category/memes', label: '😂 Memes' },
+  { href: '/category/tech', labelEn: '🔧 Tech', labelUk: '🔧 Технології' },
+  { href: '/category/auto', labelEn: '🚗 Auto', labelUk: '🚗 Авто' },
+  { href: '/category/gaming', labelEn: '🎮 Gaming', labelUk: '🎮 Ігри' },
+  { href: '/category/auto-safety', labelEn: '🛡️ Auto Safety', labelUk: '🛡️ Авто Безпека' },
+  { href: '/category/auto-news', labelEn: '🚘 Auto News', labelUk: '🚘 Авто Новини' },
+  { href: '/category/pc-hardware', labelEn: '💻 PC Hardware', labelUk: '💻 ПК Залізо' },
+  { href: '/category/gaming-news', labelEn: '🕹️ Gaming News', labelUk: '🕹️ Ігрові Новини' },
+  { href: '/category/ai', labelEn: '🧠 AI', labelUk: '🧠 ШІ' },
+  { href: '/category/memes', labelEn: '😂 Memes', labelUk: '😂 Меми' },
 ];
 
 export default function Header() {
+  const router = useRouter();
   const [lang, setLang] = useState<'en'|'uk'>('en');
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const saved = document.cookie.split('; ').find(row => row.startsWith('lang='))?.split('=')[1];
+    if (saved === 'uk') setLang('uk');
+  }, []);
+
+  const handleLangChange = (newLang: 'en'|'uk') => {
+    setLang(newLang);
+    document.cookie = `lang=${newLang}; path=/; max-age=31536000`;
+    router.refresh();
+  };
 
   return (
     <header>
@@ -25,13 +38,13 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="desktop-nav">
-          {NAV.map(n => <Link key={n.href} href={n.href}>{n.label}</Link>)}
+          {NAV.map(n => <Link key={n.href} href={n.href}>{lang === 'uk' ? n.labelUk : n.labelEn}</Link>)}
         </nav>
 
         <div style={{ display:'flex', gap:'0.75rem', alignItems:'center' }}>
           <div className="lang-switcher">
-            <button className={`lang-btn ${lang==='en'?'active':''}`} onClick={()=>setLang('en')}>EN</button>
-            <button className={`lang-btn ${lang==='uk'?'active':''}`} onClick={()=>setLang('uk')}>UK</button>
+            <button className={`lang-btn ${lang==='en'?'active':''}`} onClick={()=>handleLangChange('en')}>EN</button>
+            <button className={`lang-btn ${lang==='uk'?'active':''}`} onClick={()=>handleLangChange('uk')}>UK</button>
           </div>
           {/* Mobile burger */}
           <button
@@ -48,7 +61,7 @@ export default function Header() {
         <nav style={{ padding:'1rem 1.5rem', borderTop:'1px solid var(--border)', display:'flex', flexWrap:'wrap', gap:'0.75rem' }}>
           {NAV.map(n => (
             <Link key={n.href} href={n.href} style={{ color:'var(--text-secondary)', textDecoration:'none', fontSize:'0.95rem' }} onClick={()=>setMenuOpen(false)}>
-              {n.label}
+              {lang === 'uk' ? n.labelUk : n.labelEn}
             </Link>
           ))}
         </nav>

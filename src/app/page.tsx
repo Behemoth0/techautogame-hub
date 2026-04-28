@@ -4,6 +4,7 @@ import ArticleCard, { Article } from '@/components/ArticleCard';
 import AdBanner from '@/components/AdBanner';
 import { getLatestPosts } from '@/lib/posts';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 
 // Демонстраційні статті якщо немає згенерованих
 const DEMO_ARTICLES: Article[] = [
@@ -67,6 +68,8 @@ const DEMO_ARTICLES: Article[] = [
 ];
 
 export default async function HomePage() {
+  const cookieStore = cookies();
+  const lang = cookieStore.get('lang')?.value || 'en';
   let posts: Article[] = [];
   
   try {
@@ -74,8 +77,8 @@ export default async function HomePage() {
     if (rawPosts.length > 0) {
       posts = rawPosts.map(p => ({
         slug: p.slug,
-        title: p.title,
-        excerpt: p.excerpt,
+        title: (lang === 'uk' && p.titleUk) ? p.titleUk : p.title,
+        excerpt: (lang === 'uk' && p.excerptUk) ? p.excerptUk : p.excerpt,
         category: p.category,
         date: p.date,
         image: p.image,

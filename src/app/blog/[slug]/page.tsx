@@ -4,6 +4,7 @@ import AffiliateBox from '@/components/AffiliateBox';
 import AdBanner from '@/components/AdBanner';
 import { getPostBySlug, getAllPosts } from '@/lib/posts';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
 
 interface Props {
@@ -103,7 +104,13 @@ export default async function ArticlePage({ params }: Props) {
     }
   }
 
-  const htmlContent = `<p>${markdownToHtml(post.content)}</p>`;
+  const cookieStore = cookies();
+  const lang = cookieStore.get('lang')?.value || 'en';
+
+  const title = (lang === 'uk' && post.titleUk) ? post.titleUk : post.title;
+  const excerpt = (lang === 'uk' && post.excerptUk) ? post.excerptUk : post.excerpt;
+  const markdownContent = (lang === 'uk' && post.contentUk) ? post.contentUk : post.content;
+  const htmlContent = `<p>${markdownToHtml(markdownContent)}</p>`;
   const catLabel = post.category === 'tech' ? '🔧 Technology' : post.category === 'auto' ? '🚗 Auto' : '🎮 Gaming';
 
   return (
@@ -117,7 +124,7 @@ export default async function ArticlePage({ params }: Props) {
             {' → '}
             <a href={`/category/${post.category}`} style={{ color: 'var(--text-muted)' }}>{catLabel}</a>
             {' → '}
-            <span style={{ color: 'var(--text-secondary)' }}>{post.title.slice(0, 40)}...</span>
+            <span style={{ color: 'var(--text-secondary)' }}>{title.slice(0, 40)}...</span>
           </div>
 
           {/* META */}
@@ -134,16 +141,16 @@ export default async function ArticlePage({ params }: Props) {
           </div>
 
           {/* TITLE */}
-          <h1 className="article-title">{post.title}</h1>
+          <h1 className="article-title">{title}</h1>
           
           {/* EXCERPT */}
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '2rem', fontStyle: 'italic', borderLeft: '3px solid #6366f1', paddingLeft: '1rem' }}>
-            {post.excerpt}
+            {excerpt}
           </p>
 
           {/* HERO IMAGE */}
           {post.image && (
-            <img src={post.image} alt={post.title} className="article-hero-img" />
+            <img src={post.image} alt={title} className="article-hero-img" />
           )}
 
           {/* AD TOP */}

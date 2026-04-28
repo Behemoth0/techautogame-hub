@@ -22,6 +22,7 @@ export interface PostFrontmatter {
 export interface Post extends PostFrontmatter {
   slug: string;
   content: string;
+  contentUk?: string;
 }
 
 function ensurePostsDirectory() {
@@ -40,9 +41,18 @@ export function getAllPosts(): Post[] {
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const { data, content } = matter(fileContents);
     
+    let enContent = content;
+    let ukContent = content;
+    if (content.includes('---UK---')) {
+      const parts = content.split('---UK---');
+      enContent = parts[0].trim();
+      ukContent = parts[1].trim();
+    }
+    
     return {
       slug,
-      content,
+      content: enContent,
+      contentUk: ukContent,
       ...(data as PostFrontmatter),
     };
   });
@@ -58,7 +68,21 @@ export function getPostBySlug(slug: string): Post | null {
     if (fs.existsSync(fullPath)) {
       const fileContents = fs.readFileSync(fullPath, 'utf8');
       const { data, content } = matter(fileContents);
-      return { slug, content, ...(data as PostFrontmatter) };
+      
+      let enContent = content;
+      let ukContent = content;
+      if (content.includes('---UK---')) {
+        const parts = content.split('---UK---');
+        enContent = parts[0].trim();
+        ukContent = parts[1].trim();
+      }
+
+      return { 
+        slug, 
+        content: enContent, 
+        contentUk: ukContent,
+        ...(data as PostFrontmatter) 
+      };
     }
   }
   return null;

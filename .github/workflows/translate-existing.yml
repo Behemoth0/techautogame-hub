@@ -1,0 +1,42 @@
+name: 🇺🇦 Translate Existing Articles
+
+on:
+  workflow_dispatch: # Дозволяє запуск вручну через GitHub UI
+
+jobs:
+  translate-articles:
+    name: Translate Existing Articles
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🤖 Run Translation Script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/translate-existing.js
+
+      - name: 💾 Commit and Push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "TechAutoGame Bot 🤖"
+          git add content/posts/
+          
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            git commit -m "🤖 Auto-translated existing articles to Ukrainian"
+            git pull --rebase origin main
+            git push origin main
+          fi
