@@ -135,10 +135,11 @@ ${contentUk}
     fs.writeFileSync(filePath, newFileContent, 'utf8');
     console.log(`✅ Updated ${path.basename(filePath)}`);
 
-    // Wait a bit to avoid hitting rate limits on Gemini
-    await new Promise(r => setTimeout(r, 6000));
   } catch (err) {
     console.error(`❌ Failed to translate ${path.basename(filePath)}:`, err.message);
+  } finally {
+    // Wait a bit to avoid hitting rate limits on Gemini
+    await new Promise(r => setTimeout(r, 6000));
   }
 }
 
